@@ -1,0 +1,3707 @@
+﻿{
+  "paragraphs": [
+    {
+      "title": "Imports",
+      "text": "%pyspark\nfrom pyspark.ml.feature import CountVectorizer\nfrom pyspark.ml.feature import Tokenizer, RegexTokenizer\nfrom pyspark.ml.feature import StringIndexer\nfrom pyspark.ml.feature import VectorAssembler\nfrom pyspark.ml.classification import NaiveBayes\n",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:30:02+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true,
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733929_2065995470",
+      "id": "paragraph_1639249348099_1654328282",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "status": "READY",
+      "focus": true,
+      "$$hashKey": "object:14880"
+    },
+    {
+      "title": "Lendo o Dataset",
+      "text": "%pyspark\nrdd = sc.textFile('s3://megadados-alunos/dados/all_reviews_clean_tsv/')",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T20:37:25+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionSupport": true,
+          "completionKey": "TAB"
+        },
+        "editorMode": "ace/mode/python",
+        "colWidth": 12,
+        "editorHide": false,
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733929_442884438",
+      "id": "20211211-150226_315531276",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "dateStarted": "2021-12-13T20:37:25+0000",
+      "dateFinished": "2021-12-13T20:37:25+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14881"
+    },
+    {
+      "title": "Calculando a quantidade de linhas",
+      "text": "%pyspark\nrdd.count()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T14:45:33+0000",
+      "progress": 0,
+      "config": {
+        "lineNumbers": false,
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionSupport": true,
+          "completionKey": "TAB"
+        },
+        "editorMode": "ace/mode/python",
+        "colWidth": 12,
+        "editorHide": false,
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "150962278\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733929_633739150",
+      "id": "20211211-150226_1888347360",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "status": "READY",
+      "$$hashKey": "object:14882"
+    },
+    {
+      "title": "Observando um pouco mais...",
+      "text": "%pyspark\nrdd.take(5)",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T14:45:33+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionSupport": true,
+          "completionKey": "TAB"
+        },
+        "editorMode": "ace/mode/python",
+        "colWidth": 12,
+        "editorHide": false,
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "['US\\t3653882\\tR3O9SGZBVQBV76\\tB00FALQ1ZC\\t937001370\\tInvicta Women\\'s 15150 \"Angel\" 18k Yellow Gold Ion-Plated Stainless Steel and Brown Leather Watch\\tWatches\\t5\\t0\\t0\\tN\\tY\\tFive Stars\\tAbsolutely love this watch! Get compliments almost every time I wear it. Dainty.\\t2015-08-31', \"US\\t14661224\\tRKH8BNC3L5DLF\\tB00D3RGO20\\t484010722\\tKenneth Cole New York Women's KC4944 Automatic Silver Automatic Mesh Bracelet Analog Watch\\tWatches\\t5\\t0\\t0\\tN\\tY\\tI love thiswatch it keeps time wonderfully\\tI love this watch it keeps time wonderfully.\\t2015-08-31\", 'US\\t27324930\\tR2HLE8WKZSU3NL\\tB00DKYC7TK\\t361166390\\tRitche 22mm Black Stainless Steel Bracelet Watch Band Strap Pebble Time/Pebble Classic\\tWatches\\t2\\t1\\t1\\tN\\tY\\tTwo Stars\\tScratches\\t2015-08-31', \"US\\t7211452\\tR31U3UH5AZ42LL\\tB000EQS1JW\\t958035625\\tCitizen Men's BM8180-03E Eco-Drive Stainless Steel Watch with Green Canvas Band\\tWatches\\t5\\t0\\t0\\tN\\tY\\tFive Stars\\tIt works well on me. However, I found cheaper prices in other places after making the purchase\\t2015-08-31\", \"US\\t12733322\\tR2SV659OUJ945Y\\tB00A6GFD7S\\t765328221\\tOrient ER27009B Men's Symphony Automatic Stainless Steel Black Dial Mechanical Watch\\tWatches\\t4\\t0\\t0\\tN\\tY\\tBeautiful face, but cheap sounding links\\tBeautiful watch face.  The band looks nice all around.  The links do make that squeaky cheapo noise when you swing it back and forth on your wrist which can be embarrassing in front of watch enthusiasts.  However, to the naked eye from afar, you can't tell the links are cheap or folded because it is well polished and brushed and the folds are pretty tight for the most part.<br /><br />I love the new member of my collection and it looks great.  I've had it for about a week and so far it has kept good time despite day 1 which is typical of a new mechanical watch\\t2015-08-31\"]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733929_968322538",
+      "id": "20211211-150226_2028748131",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "status": "READY",
+      "$$hashKey": "object:14883"
+    },
+    {
+      "text": "%pyspark\nrdd =  rdd.cache()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T14:45:33+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionSupport": true,
+          "completionKey": "TAB"
+        },
+        "editorMode": "ace/mode/python",
+        "colWidth": 12,
+        "editorHide": false,
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733930_2101057200",
+      "id": "20211211-150226_1145167572",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "status": "READY",
+      "$$hashKey": "object:14884"
+    },
+    {
+      "title": "Fragmentando as linhas",
+      "text": "%pyspark\nrdd_response = rdd.map(lambda x: x.split('\\t')) ",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T20:37:37+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionSupport": true,
+          "completionKey": "TAB"
+        },
+        "editorMode": "ace/mode/python",
+        "colWidth": 12,
+        "editorHide": false,
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733930_1274565100",
+      "id": "20211211-150226_594073744",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "dateStarted": "2021-12-13T20:37:37+0000",
+      "dateFinished": "2021-12-13T20:37:37+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14885"
+    },
+    {
+      "text": "%pyspark\nrdd_response.count()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T14:45:33+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionSupport": true,
+          "completionKey": "TAB"
+        },
+        "editorMode": "ace/mode/python",
+        "colWidth": 12,
+        "editorHide": false,
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "150962278\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733930_1033405036",
+      "id": "20211211-150226_1012761337",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "status": "READY",
+      "$$hashKey": "object:14886"
+    },
+    {
+      "title": "Task 1",
+      "text": "",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T14:45:33+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733930_1998388574",
+      "id": "paragraph_1639242200432_1338400792",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "status": "READY",
+      "$$hashKey": "object:14887"
+    },
+    {
+      "title": "Quantidade de reviews",
+      "text": "%pyspark\nreviews= rdd.count()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T14:45:33+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionSupport": true,
+          "completionKey": "TAB"
+        },
+        "editorMode": "ace/mode/python",
+        "colWidth": 12,
+        "editorHide": false,
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733930_310135951",
+      "id": "20211211-150226_1874750006",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "status": "READY",
+      "$$hashKey": "object:14888"
+    },
+    {
+      "text": "%pyspark\nreviews",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T14:45:33+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "150962278\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733931_1042786207",
+      "id": "paragraph_1639242244704_503256336",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "status": "READY",
+      "$$hashKey": "object:14889"
+    },
+    {
+      "title": "Quantidade de clientes",
+      "text": "%pyspark\nrdd_clients = rdd_response \\\n    .map(lambda x: x[1]).distinct()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T14:45:33+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionSupport": true,
+          "completionKey": "TAB"
+        },
+        "editorMode": "ace/mode/python",
+        "colWidth": 12,
+        "editorHide": false,
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733931_365772903",
+      "id": "20211211-150226_183997193",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "status": "READY",
+      "$$hashKey": "object:14890"
+    },
+    {
+      "text": "%pyspark\nrdd_clients.count()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T14:45:33+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionSupport": true,
+          "completionKey": "TAB"
+        },
+        "editorMode": "ace/mode/python",
+        "colWidth": 12,
+        "editorHide": false,
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "33497620\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733931_772812429",
+      "id": "20211211-150226_1517126372",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "status": "READY",
+      "$$hashKey": "object:14891"
+    },
+    {
+      "title": "Quantidade de produtos",
+      "text": "%pyspark\nrdd_products = rdd_response \\\n    .map(lambda x: x[3]).distinct()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T14:45:33+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionSupport": true,
+          "completionKey": "TAB"
+        },
+        "editorMode": "ace/mode/python",
+        "colWidth": 12,
+        "editorHide": false,
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733931_2086833012",
+      "id": "20211211-150226_1647309978",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "status": "READY",
+      "$$hashKey": "object:14892"
+    },
+    {
+      "text": "%pyspark\nrdd_products.count()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T14:45:33+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionSupport": true,
+          "completionKey": "TAB"
+        },
+        "editorMode": "ace/mode/python",
+        "colWidth": 12,
+        "editorHide": false,
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "21390118\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733931_1311707281",
+      "id": "20211211-150226_2120011059",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "status": "READY",
+      "$$hashKey": "object:14893"
+    },
+    {
+      "title": "Reviews por 'star_rating'",
+      "text": "\n%pyspark\nratings=rdd_response.map(lambda x: x[7]).countByValue().items()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T14:45:33+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python",
+        "colWidth": 12,
+        "editorHide": false,
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733931_16220135",
+      "id": "20211211-150226_1208313386",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "status": "READY",
+      "$$hashKey": "object:14894"
+    },
+    {
+      "text": "%pyspark\nratings",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T14:45:33+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "dict_items([('5', 93200812), ('2', 7304430), ('4', 26223470), ('1', 12099639), ('3', 12133927)])\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733932_1368818585",
+      "id": "paragraph_1639236289038_95704392",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "status": "READY",
+      "$$hashKey": "object:14895"
+    },
+    {
+      "title": "Item desafio",
+      "text": "%pyspark\nspark = SparkSession.builder.appName('ReviewClassifier').getOrCreate()\n# Load data and rename column\ndf_desafio = spark.read.option(\"header\", \"false\") \\\n    .option(\"delimiter\", \"\\t\") \\\n    .option(\"inferSchema\", \"true\") \\\n    .csv(\"s3://megadados-alunos/dados/all_reviews_clean_tsv/\") \\\n    .withColumnRenamed(\"_c1\", \"customer_id\") \\\n    .withColumnRenamed(\"_c3\", \"product_id\") \\\n    .withColumnRenamed(\"_c5\", \"product_title\") \\\n    .withColumnRenamed(\"_c7\", \"star_rating\")",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:13:09+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true,
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=157",
+              "$$hashKey": "object:17835"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=158",
+              "$$hashKey": "object:17836"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=159",
+              "$$hashKey": "object:17837"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733932_1589093245",
+      "id": "paragraph_1639236072865_177407339",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "dateStarted": "2021-12-13T20:41:16+0000",
+      "dateFinished": "2021-12-13T20:43:15+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14896"
+    },
+    {
+      "title": "Criando o dataset de interesse ",
+      "text": "%pyspark\ndf_clientes=df_desafio.select(\"customer_id\",\"product_id\", \"product_title\", \"star_rating\")\ndf_clientes.show()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:33:15+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+-----------+----------+--------------------+-----------+\n|customer_id|product_id|       product_title|star_rating|\n+-----------+----------+--------------------+-----------+\n|   49303758|006196140X|Dear Cary: My Lif...|          4|\n|   45359011|1609761685|Rachel and Sammy ...|          5|\n|   16024217|0953674509|Wicca Unveiled: T...|          3|\n|   46830129|1466263687|The Ultimate Hang...|          5|\n|   35489180|0755381173|A Discovery of Wi...|          5|\n|   26688061|1582613575|Touched: The Jerr...|          1|\n|   35656627|143895512X|Your Better Self:...|          5|\n|   16073212|1582613575|Touched: The Jerr...|          1|\n|   22431040|1935708449|My Life as Laura:...|          5|\n|   41733776|1250000238|Dragon's Oath (Ho...|          3|\n|   35616088|1892112000| To Train Up a Child|          5|\n|   23240151|1596982926|Sweet Land of Lib...|          5|\n|   35433720|0060596996|Lit: A Memoir (P.S.)|          4|\n|   49957928|B005SMWSHS|       Into the Wild|          4|\n|   52733753|1892112000| To Train Up a Child|          5|\n|   51803143|0878055339|Conversations wit...|          5|\n|   51307077|0470258233|SolidWorks Surfac...|          2|\n|   24284623|1599906813|     After Obsession|          2|\n|   45616010|0316056197|        Ship Breaker|          5|\n|   13200166|0312622082|Gypsy Boy: My Lif...|          5|\n+-----------+----------+--------------------+-----------+\nonly showing top 20 rows\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=161",
+              "$$hashKey": "object:17903"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639428135042_1870761060",
+      "id": "paragraph_1639428135042_1870761060",
+      "dateCreated": "2021-12-13T20:42:15+0000",
+      "dateStarted": "2021-12-13T20:44:20+0000",
+      "dateFinished": "2021-12-13T20:44:21+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14897"
+    },
+    {
+      "title": "Realizando a análise de reviews por cliente",
+      "text": "%pyspark\ndf_desafioCostumer= df_clientes.groupBy('customer_id').count()\ndf_desafioCostumer.show()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:33:41+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+-----------+-----+\n|customer_id|count|\n+-----------+-----+\n|   17481726|  420|\n|   31114821|  480|\n|   52385433|    5|\n|   15925905|   29|\n|   18655643|    6|\n|   17546748|    2|\n|   53025658|    5|\n|   31977487|    1|\n|   32115803|    1|\n|   16489869|   47|\n|   16068523|   25|\n|   10406970|    2|\n|   27553855|    5|\n|   23500459|    1|\n|   46490117|    9|\n|   13975332|   56|\n|   51571609|  323|\n|   26526777|   12|\n|   14444960|   13|\n|   42780002|    4|\n+-----------+-----+\nonly showing top 20 rows\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=162",
+              "$$hashKey": "object:17961"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=163",
+              "$$hashKey": "object:17962"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639428274175_1926905052",
+      "id": "paragraph_1639428274175_1926905052",
+      "dateCreated": "2021-12-13T20:44:34+0000",
+      "dateStarted": "2021-12-13T20:45:26+0000",
+      "dateFinished": "2021-12-13T20:46:52+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14898"
+    },
+    {
+      "title": "Criando um dataframe com apenas os clientes que realizaram uma review",
+      "text": "%pyspark\ndf_clientesUnicos = df_desafioCostumer.filter(\"count == 1\")\ndf_clientesUnicos.show()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:34:04+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+-----------+-----+\n|customer_id|count|\n+-----------+-----+\n|   11669230|    1|\n|   38618596|    1|\n|   32556773|    1|\n|   19150637|    1|\n|    9901007|    1|\n|   12293946|    1|\n|   25811831|    1|\n|   20583538|    1|\n|   46010217|    1|\n|   39320453|    1|\n|   23567600|    1|\n|   42119611|    1|\n|   52032641|    1|\n|   38814042|    1|\n|   48365424|    1|\n|   44053103|    1|\n|   50087321|    1|\n|   19645866|    1|\n|   47852511|    1|\n|   41568891|    1|\n+-----------+-----+\nonly showing top 20 rows\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=164",
+              "$$hashKey": "object:18024"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=165",
+              "$$hashKey": "object:18025"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639428347825_401580280",
+      "id": "paragraph_1639428347825_401580280",
+      "dateCreated": "2021-12-13T20:45:47+0000",
+      "dateStarted": "2021-12-13T20:46:58+0000",
+      "dateFinished": "2021-12-13T20:48:11+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14899"
+    },
+    {
+      "title": "Obtendo um dataframe com as informações relevantes sobre a review do cliente ",
+      "text": "%pyspark\ndf_desafioJoin = df_clientesUnicos.join(df_clientes, df_clientesUnicos.customer_id == df_clientes.customer_id, 'inner').select(df_clientesUnicos.customer_id, df_clientes.product_id,df_clientes.product_title, df_clientes.star_rating)    \ndf_desafioJoin.show()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:37:12+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+-----------+----------+--------------------+-----------+\n|customer_id|product_id|       product_title|star_rating|\n+-----------+----------+--------------------+-----------+\n|      10362|B000QZU0B8|Secrets Of A Pass...|          3|\n|      10623|B00G6DHGKM|Leegoal(TM) Siliv...|          5|\n|      10914|0446585041|Seriously...I'm K...|          1|\n|      12046|B005Z294OQ|G13 (With Micro 4...|          5|\n|      18201|B0042HKMCI|Replacement Vapor...|          1|\n|      19206|B00PGAXJ7U|Teddie Organics R...|          5|\n|      19758|B003AJLQ4W|Sedu Revolution T...|          1|\n|      20382|B00F8G5VYG|TaylorMade Men's ...|          5|\n|      20396|B0046RTPMW|InCharacter Costu...|          4|\n|      22990|B002BBJMO6|Zeimax® 3 Pack of...|          5|\n|      23706|B009JGXBFM|Seiko Men's Solar...|          3|\n|      23709|B007HH5IO2|       Blind Courage|          5|\n|      24663|B004YL6PTG|Gnome Greeter Gar...|          5|\n|      24728|B00BC38B2S|URGE Basics Sound...|          5|\n|      25283|1428319360|Refrigeration and...|          5|\n|      25591|B00IHRDGFY|Patuoxun Wireless...|          4|\n|      26087|B00LI6724W|Hurley Men's Icon...|          4|\n|      28024|B00CBTKHQ0|Bare Lifts Instan...|          5|\n|      29595|B00AKJDJ4U|Empire 3 Pack of ...|          5|\n|      32445|B00EQM1UP2|14K White Gold 4m...|          5|\n+-----------+----------+--------------------+-----------+\nonly showing top 20 rows\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=166",
+              "$$hashKey": "object:18087"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=167",
+              "$$hashKey": "object:18088"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=168",
+              "$$hashKey": "object:18089"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639428557688_1787255456",
+      "id": "paragraph_1639428557688_1787255456",
+      "dateCreated": "2021-12-13T20:49:17+0000",
+      "dateStarted": "2021-12-13T20:52:16+0000",
+      "dateFinished": "2021-12-13T20:54:57+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14900"
+    },
+    {
+      "text": "%pyspark\nfrom pyspark.sql.types import DoubleType, IntegerType, DateType\ndf_desafioJoin['star_rating'].cast(IntegerType())",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:16:27+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "Column<b'CAST(star_rating AS DOUBLE)'>\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639430029100_1855609230",
+      "id": "paragraph_1639430029100_1855609230",
+      "dateCreated": "2021-12-13T21:13:49+0000",
+      "dateStarted": "2021-12-13T21:16:06+0000",
+      "dateFinished": "2021-12-13T21:16:06+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14901"
+    },
+    {
+      "title": "Calculando a média de avaliações por produto",
+      "text": "%pyspark\nfrom pyspark.sql.functions import mean as mean_\n\ndf_mean = df_desafioJoin.groupBy('product_id').agg(mean_('star_rating'))\ndf_mean.show()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:37:39+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+----------+------------------+\n|product_id|  avg(star_rating)|\n+----------+------------------+\n|B00A9MPBG2|               3.0|\n|B00LOCIC08|               1.0|\n|B009AI6FC0|               5.0|\n|B004HSO124|             4.375|\n|B009OYTAL8|4.7894736842105265|\n|B002UUTJTG|              4.35|\n|B00005JO4T| 4.666666666666667|\n|B007X67ETO|2.8095238095238093|\n|B002FYAGEO|               1.0|\n|B000SFCTG0|               4.8|\n|B00426C57O|3.8962962962962964|\n|B00EQ0Y0PG|               5.0|\n|B001E2EL3K|               1.0|\n|B00I51BWAS| 2.642857142857143|\n|B005G8VF7S|               5.0|\n|B008MW6Y12| 4.232558139534884|\n|B00004R9TL| 4.684210526315789|\n|B000HBMFRS| 3.327272727272727|\n|0975303627|               5.0|\n|B0103L92TK| 4.666666666666667|\n+----------+------------------+\nonly showing top 20 rows\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=177",
+              "$$hashKey": "object:18207"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=178",
+              "$$hashKey": "object:18208"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=179",
+              "$$hashKey": "object:18209"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=180",
+              "$$hashKey": "object:18210"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639429617019_399312643",
+      "id": "paragraph_1639429617019_399312643",
+      "dateCreated": "2021-12-13T21:06:57+0000",
+      "dateStarted": "2021-12-13T21:18:33+0000",
+      "dateFinished": "2021-12-13T21:21:24+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14902"
+    },
+    {
+      "text": "%pyspark\ndf_mean = df_mean.withColumnRenamed(\"avg(star_rating)\", \"mean_rating\")\ndf_mean.show()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:30:55+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+----------+------------------+\n|product_id|       mean_rating|\n+----------+------------------+\n|B00OZY3HCA|             2.625|\n|B0018OUDC2|               3.2|\n|B00JVNBHHW|               1.6|\n|B0009NZ3YG|               5.0|\n|B00BRKH7OY|               3.0|\n|B00JML9M2U|               3.9|\n|143541859X|               5.0|\n|B0001AVZ9Y|               3.9|\n|B00KDPWPPA|2.3333333333333335|\n|B00I1WA1BC|               1.0|\n|B00BOZ3WH8|               4.0|\n|B00BNWB5IA|               5.0|\n|B00HCMMQ06|               5.0|\n|B00CF6ZFAW| 4.823008849557522|\n|B000HBMFRS| 3.327272727272727|\n|B0002CZTIE| 4.666666666666667|\n|0990990907|               5.0|\n|B0073OGHJO|               3.8|\n|B00AU63D3U|               5.0|\n|B000F1DF4W|               4.0|\n+----------+------------------+\nonly showing top 20 rows\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=185",
+              "$$hashKey": "object:18280"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=186",
+              "$$hashKey": "object:18281"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=187",
+              "$$hashKey": "object:18282"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=188",
+              "$$hashKey": "object:18283"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639430733107_575174190",
+      "id": "paragraph_1639430733107_575174190",
+      "dateCreated": "2021-12-13T21:25:33+0000",
+      "dateStarted": "2021-12-13T21:30:55+0000",
+      "dateFinished": "2021-12-13T21:33:29+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14903"
+    },
+    {
+      "title": "Calculando a quantidade de reviews por produto",
+      "text": "%pyspark\ndf_desafioProdutos= df_desafioJoin.groupBy('product_id').count()\ndf_desafioProdutos.show()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:38:03+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+----------+-----+\n|product_id|count|\n+----------+-----+\n|B00O2OHOBI|   45|\n|B00WY7562E|    7|\n|B00KYI0NZA|    1|\n|B00AECQJIG|    1|\n|B00FEONVDK|    6|\n|B00PTNKHF6|    8|\n|B00K2RGE6A|    3|\n|B00BGUTMIE|    5|\n|B008ZXOAN2|   24|\n|B0014C7XB2|    3|\n|B000HBMFRS|  275|\n|1496055519|    8|\n|B00GWBVPQ4|   16|\n|B00970RSGS|    5|\n|B008W2JL7G|    1|\n|B00D3FG6WU|    1|\n|B0052ONXJ4|    8|\n|B001BIXJG2|   10|\n|B00D8KXER0|    1|\n|B000063S3Z|    4|\n+----------+-----+\nonly showing top 20 rows\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=169",
+              "$$hashKey": "object:18353"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=170",
+              "$$hashKey": "object:18354"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=171",
+              "$$hashKey": "object:18355"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=172",
+              "$$hashKey": "object:18356"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639428483999_783635893",
+      "id": "paragraph_1639428483999_783635893",
+      "dateCreated": "2021-12-13T20:48:03+0000",
+      "dateStarted": "2021-12-13T20:55:06+0000",
+      "dateFinished": "2021-12-13T20:57:42+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14904"
+    },
+    {
+      "title": "Selecionando apenas os produtos com mais de 10 reviews",
+      "text": "%pyspark\ndf_produtos10 = df_desafioProdutos.filter(\"count > 10\")\ndf_produtos10.show()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:38:26+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+----------+-----+\n|product_id|count|\n+----------+-----+\n|B00URFFGQG|   28|\n|B00JSCVLWW|   13|\n|B004HSO124|   24|\n|B009OYTAL8|   19|\n|B00IZPK0Q6|  101|\n|B002UUTJTG|   20|\n|B00005JO4T|   12|\n|B007X67ETO|   21|\n|B00426C57O|  135|\n|B002DZI0RU|   24|\n|B00I51BWAS|   14|\n|B008MW6Y12|  301|\n|B00004R9TL|   38|\n|B000HBMFRS|  275|\n|B0000BUSS6|   21|\n|B005SUHPGE|   42|\n|0312650256|   16|\n|B00H3OYSHW|   47|\n|B003PGRGGW|   30|\n|0738205737|   43|\n+----------+-----+\nonly showing top 20 rows\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=173",
+              "$$hashKey": "object:18426"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=174",
+              "$$hashKey": "object:18427"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=175",
+              "$$hashKey": "object:18428"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=176",
+              "$$hashKey": "object:18429"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639429083473_1352487127",
+      "id": "paragraph_1639429083473_1352487127",
+      "dateCreated": "2021-12-13T20:58:03+0000",
+      "dateStarted": "2021-12-13T20:58:43+0000",
+      "dateFinished": "2021-12-13T21:01:32+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14905"
+    },
+    {
+      "title": "Relacionando o produto com a sua avaliação média",
+      "text": "%pyspark\ndf_final = df_produtos10.join(df_mean, df_produtos10.product_id == df_mean.product_id, 'inner').select(df_produtos10.product_id, df_mean.mean_rating)    \ndf_final.show()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:39:17+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+----------+------------------+\n|product_id|       mean_rating|\n+----------+------------------+\n|0028630394| 4.538461538461538|\n|0060114185| 4.933333333333334|\n|0060256656| 4.365384615384615|\n|0060391448|               4.0|\n|0060391626| 4.528409090909091|\n|0060540745| 3.857142857142857|\n|0060557818| 4.357142857142857|\n|0060560053| 4.105263157894737|\n|0060569662| 4.421052631578948|\n|0060571314|3.6363636363636362|\n|0060652381| 4.235294117647059|\n|0060734434|3.8333333333333335|\n|0060736771| 4.166666666666667|\n|0060737980|               3.4|\n|0060742763|3.8181818181818183|\n|0060754281| 4.565217391304348|\n|0060755598| 4.583333333333333|\n|0060757353| 4.222222222222222|\n|0060835834| 4.529411764705882|\n|0060850523| 3.914285714285714|\n+----------+------------------+\nonly showing top 20 rows\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=189",
+              "$$hashKey": "object:18499"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=190",
+              "$$hashKey": "object:18500"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=191",
+              "$$hashKey": "object:18501"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=192",
+              "$$hashKey": "object:18502"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=193",
+              "$$hashKey": "object:18503"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=194",
+              "$$hashKey": "object:18504"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639429488517_261769213",
+      "id": "paragraph_1639429488517_261769213",
+      "dateCreated": "2021-12-13T21:04:48+0000",
+      "dateStarted": "2021-12-13T21:36:36+0000",
+      "dateFinished": "2021-12-13T21:40:44+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14906"
+    },
+    {
+      "text": "%pyspark\ndf_finalReview = df_final.orderBy(\"mean_rating\",ascending=False)\ndf_finalReview.show(10)",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:41:55+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+----------+-----------+\n|product_id|mean_rating|\n+----------+-----------+\n|0547391404|        5.0|\n|0471384550|        5.0|\n|0385346549|        5.0|\n|0307168484|        5.0|\n|0375503986|        5.0|\n|0133767493|        5.0|\n|0061661228|        5.0|\n|0385504039|        5.0|\n|0399154493|        5.0|\n|0399537287|        5.0|\n+----------+-----------+\nonly showing top 10 rows\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=195",
+              "$$hashKey": "object:18582"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=196",
+              "$$hashKey": "object:18583"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=197",
+              "$$hashKey": "object:18584"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=198",
+              "$$hashKey": "object:18585"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=199",
+              "$$hashKey": "object:18586"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=200",
+              "$$hashKey": "object:18587"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639431558779_1055805198",
+      "id": "paragraph_1639431558779_1055805198",
+      "dateCreated": "2021-12-13T21:39:18+0000",
+      "dateStarted": "2021-12-13T21:41:55+0000",
+      "dateFinished": "2021-12-13T21:46:05+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14907"
+    },
+    {
+      "title": "Conclusão de quais seriam os 10 produtos em questão",
+      "text": "%pyspark\ndf_desafioConcluido = df_finalReview.join(df_desafioJoin, df_finalReview.product_id == df_desafioJoin.product_id, 'inner').select(df_finalReview.product_id, df_desafioJoin.product_title, df_finalReview.mean_rating)    \ndf_desafioConcluido.show(10)",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:52:03+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+----------+--------------------+------------------+\n|product_id|       product_title|       mean_rating|\n+----------+--------------------+------------------+\n|B00BOZ3WH8|Navajo Autumn: A ...|               4.0|\n|B00CF6ZFAW|Best Wine Aerator...| 4.823008849557522|\n|B001ASHELO|Love On The Insid...|4.6521739130434785|\n|B00K3NNGW8|Ice Station Wolfe...|               2.0|\n|B008MW6Y12|NIX 8 inch Hi-Res...| 4.232558139534884|\n|B0000665TD|J-2000 Garment St...| 4.481481481481482|\n|B003S7T8NM|PromiseU Women's ...|             2.875|\n|B0064ED1U2|Earphones Stereo ...|1.8717948717948718|\n|B00IZPK0Q6|Pure Garcinia Cam...| 4.603960396039604|\n|B0074YR6BQ|Gamo Bone Collect...| 3.391304347826087|\n+----------+--------------------+------------------+\nonly showing top 10 rows\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=212",
+              "$$hashKey": "object:18665"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=213",
+              "$$hashKey": "object:18666"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=214",
+              "$$hashKey": "object:18667"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=215",
+              "$$hashKey": "object:18668"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=216",
+              "$$hashKey": "object:18669"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=217",
+              "$$hashKey": "object:18670"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=218",
+              "$$hashKey": "object:18671"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=219",
+              "$$hashKey": "object:18672"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=220",
+              "$$hashKey": "object:18673"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=222",
+              "$$hashKey": "object:18674"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639431766049_1883398168",
+      "id": "paragraph_1639431766049_1883398168",
+      "dateCreated": "2021-12-13T21:42:46+0000",
+      "dateStarted": "2021-12-13T21:52:03+0000",
+      "dateFinished": "2021-12-13T21:57:18+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14908"
+    },
+    {
+      "text": "%pyspark\ndf_desafioFinal = df_desafioConcluido.orderBy(\"mean_rating\",ascending=False)\ndf_desafioFinal.show(10)",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:54:05+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+----------+--------------------+-----------+\n|product_id|       product_title|mean_rating|\n+----------+--------------------+-----------+\n|0974786985|Jeanne Carley's F...|        5.0|\n|0743572203|Liberty and Tyran...|        5.0|\n|B005KJ9KPC|Chicago Skyline 2...|        5.0|\n|0230623174|Vested Outsourcin...|        5.0|\n|1414397488|Nobody's Cuter th...|        5.0|\n|B00JAQN7N2|The Quarter-Life ...|        5.0|\n|0989768457|  Hardwired (Hacker)|        5.0|\n|B00L11GBSC|               Stars|        5.0|\n|1605987980|Project Animal Fa...|        5.0|\n|B000005ALN|               Older|        5.0|\n+----------+--------------------+-----------+\nonly showing top 10 rows\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=223",
+              "$$hashKey": "object:18768"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=224",
+              "$$hashKey": "object:18769"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=225",
+              "$$hashKey": "object:18770"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=226",
+              "$$hashKey": "object:18771"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=227",
+              "$$hashKey": "object:18772"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=228",
+              "$$hashKey": "object:18773"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=229",
+              "$$hashKey": "object:18774"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=230",
+              "$$hashKey": "object:18775"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=231",
+              "$$hashKey": "object:18776"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=233",
+              "$$hashKey": "object:18777"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639432422074_883281471",
+      "id": "paragraph_1639432422074_883281471",
+      "dateCreated": "2021-12-13T21:53:42+0000",
+      "dateStarted": "2021-12-13T21:54:05+0000",
+      "dateFinished": "2021-12-13T22:02:36+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14909"
+    },
+    {
+      "title": "Task 2",
+      "text": "",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:53:24+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639432079811_1594313505",
+      "id": "paragraph_1639432079811_1594313505",
+      "dateCreated": "2021-12-13T21:47:59+0000",
+      "status": "READY",
+      "$$hashKey": "object:14910"
+    },
+    {
+      "title": "Criando o DF",
+      "text": "%pyspark\n\nfrom pyspark.sql import SparkSession\nspark = SparkSession.builder.appName('ReviewClassifier').getOrCreate()\n# Load data and rename column\ndf = spark.read.option(\"header\", \"false\") \\\n    .option(\"delimiter\", \"\\t\") \\\n    .option(\"inferSchema\", \"true\") \\\n    .csv(\"s3://megadados-alunos/dados/all_reviews_clean_tsv/\") \\\n    .withColumnRenamed(\"_c1\", \"customer_id\") \\\n    .withColumnRenamed(\"_c6\", \"product_category\") \\\n    .withColumnRenamed(\"_c7\", \"star_rating\") \\\n    .withColumnRenamed(\"_c8\", \"helpful_votes\") \\\n    .withColumnRenamed(\"_c13\", \"review_body\")\n",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T18:52:58+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=115",
+              "$$hashKey": "object:18903"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=116",
+              "$$hashKey": "object:18904"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=117",
+              "$$hashKey": "object:18905"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733933_974474806",
+      "id": "paragraph_1639238080699_570166643",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "dateStarted": "2021-12-13T18:52:58+0000",
+      "dateFinished": "2021-12-13T18:54:55+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14911"
+    },
+    {
+      "title": "",
+      "text": "%pyspark\ndf_bot=df.select(\"customer_id\",\"product_category\", \"star_rating\", \"helpful_votes\")",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:48:35+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "title": false,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733933_413514320",
+      "id": "paragraph_1639254159738_1992767816",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "dateStarted": "2021-12-13T18:53:39+0000",
+      "dateFinished": "2021-12-13T18:54:55+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14912"
+    },
+    {
+      "title": "Construindo o DataSet para análise do perfil dos Bots",
+      "text": "%pyspark\ndf_bot.show()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T18:53:40+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true,
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+-----------+----------------+-----------+-------------+\n|customer_id|product_category|star_rating|helpful_votes|\n+-----------+----------------+-----------+-------------+\n|   49303758|           Books|          4|            1|\n|   45359011|           Books|          5|            0|\n|   16024217|           Books|          3|            0|\n|   46830129|           Books|          5|            0|\n|   35489180|           Books|          5|            1|\n|   26688061|           Books|          1|           22|\n|   35656627|           Books|          5|            0|\n|   16073212|           Books|          1|            7|\n|   22431040|           Books|          5|            4|\n|   41733776|           Books|          3|            0|\n|   35616088|           Books|          5|           25|\n|   23240151|           Books|          5|            2|\n|   35433720|           Books|          4|            1|\n|   49957928|           Books|          4|            0|\n|   52733753|           Books|          5|           30|\n|   51803143|           Books|          5|            4|\n|   51307077|           Books|          2|            4|\n|   24284623|           Books|          2|            0|\n|   45616010|           Books|          5|            0|\n|   13200166|           Books|          5|            4|\n+-----------+----------------+-----------+-------------+\nonly showing top 20 rows\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=118",
+              "$$hashKey": "object:19013"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733933_273497578",
+      "id": "paragraph_1639255732592_857022104",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "dateStarted": "2021-12-13T18:54:55+0000",
+      "dateFinished": "2021-12-13T18:54:55+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14913"
+    },
+    {
+      "text": "%pyspark\ndf_costumer= df_bot.groupBy('customer_id').count()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T15:43:09+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733934_350020696",
+      "id": "paragraph_1639254516647_303755941",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "dateStarted": "2021-12-13T15:43:09+0000",
+      "dateFinished": "2021-12-13T15:43:09+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14914"
+    },
+    {
+      "title": "Análise da quantidade de reviews por clientes",
+      "text": "%pyspark\ndf_costumer.show()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T18:37:48+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true,
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+-----------+-----+\n|customer_id|count|\n+-----------+-----+\n|   27216938|   23|\n|   52706060|    5|\n|   25198923|    5|\n|   15217449|    1|\n|   26904397|   48|\n|   34588099|    3|\n|   33658169|    4|\n|   23867370|    5|\n|   15566623|    7|\n|   23566240|   10|\n|   45305234|    5|\n|   15052784|    6|\n|   44109125|    4|\n|   34501870|  305|\n|   47038419|   52|\n|   21893210|    1|\n|   20594530|   14|\n|   30389172|    3|\n|   48706814|   18|\n|   51625131|  105|\n+-----------+-----+\nonly showing top 20 rows\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=26",
+              "$$hashKey": "object:19113"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=27",
+              "$$hashKey": "object:19114"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733934_166820117",
+      "id": "paragraph_1639255429744_1425044882",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "dateStarted": "2021-12-13T15:43:23+0000",
+      "dateFinished": "2021-12-13T15:44:50+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14915"
+    },
+    {
+      "text": "%pyspark\ndf_botReview = df_costumer.orderBy(\"count\",ascending=False)",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T15:44:11+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733934_426899210",
+      "id": "paragraph_1639255431771_1333943011",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "dateStarted": "2021-12-13T15:44:11+0000",
+      "dateFinished": "2021-12-13T15:44:50+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14916"
+    },
+    {
+      "title": "Ordenando para analisar os maiores números de reviews",
+      "text": "%pyspark\ndf_botReview.show(50)",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T18:38:23+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+-----------+-----+\n|customer_id|count|\n+-----------+-----+\n|   50122160|59623|\n|   50732546|30761|\n|   52496677|14391|\n|   52004451|10905|\n|   50736950|10129|\n|   18116317| 8727|\n|   44731853| 7593|\n|   50881246| 7403|\n|   38002140| 7197|\n|   36642996| 6988|\n|   43430756| 6610|\n|   50068216| 6540|\n|    7080939| 6503|\n|   37529167| 6447|\n|   50913245| 6301|\n|   50199793| 5874|\n|   20018062| 5810|\n|   14539589| 5706|\n|   38214553| 5683|\n|   51184997| 5533|\n|   53037408| 5370|\n|   46877221| 5354|\n|   20595117| 5268|\n|   32405532| 5266|\n|   50820654| 5019|\n|   52895956| 4964|\n|   50699505| 4912|\n|   43530996| 4847|\n|   45041039| 4793|\n|   13161706| 4784|\n|   42418272| 4679|\n|   22073263| 4633|\n|   23267387| 4473|\n|   14410556| 4373|\n|   50776149| 4283|\n|   52615377| 4264|\n|   45450659| 4263|\n|   50345651| 4206|\n|   30678701| 4175|\n|   50441674| 4057|\n|   44834233| 4046|\n|   51110953| 3963|\n|   45838740| 3936|\n|   45273033| 3925|\n|   38491967| 3879|\n|   14720400| 3804|\n|   42800127| 3591|\n|   49944666| 3573|\n|   53017806| 3568|\n|   43856165| 3547|\n+-----------+-----+\nonly showing top 50 rows\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=28",
+              "$$hashKey": "object:19218"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=29",
+              "$$hashKey": "object:19219"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639407584954_1194430728",
+      "id": "paragraph_1639407584954_1194430728",
+      "dateCreated": "2021-12-13T14:59:44+0000",
+      "dateStarted": "2021-12-13T15:44:50+0000",
+      "dateFinished": "2021-12-13T15:46:06+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14917"
+    },
+    {
+      "title": "Entendendo o comportamento da quantidade de reviews",
+      "text": "%pyspark\ndf_botReview.describe(['count']).show()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T18:39:02+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+-------+------------------+\n|summary|             count|\n+-------+------------------+\n|  count|          33497620|\n|   mean| 4.506656831142033|\n| stddev|20.132207420736698|\n|    min|                 1|\n|    max|             59623|\n+-------+------------------+\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=10",
+              "$$hashKey": "object:19281"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=11",
+              "$$hashKey": "object:19282"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=12",
+              "$$hashKey": "object:19283"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=13",
+              "$$hashKey": "object:19284"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=14",
+              "$$hashKey": "object:19285"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639408224647_1636529726",
+      "id": "paragraph_1639408224647_1636529726",
+      "dateCreated": "2021-12-13T15:10:24+0000",
+      "dateStarted": "2021-12-13T15:10:50+0000",
+      "dateFinished": "2021-12-13T15:12:29+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14918"
+    },
+    {
+      "text": "%pyspark\ndf_botReview.select(\"count\").summary().show()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T15:15:02+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+-------+------------------+\n|summary|             count|\n+-------+------------------+\n|  count|          33497620|\n|   mean| 4.506656831142033|\n| stddev|20.132207420736698|\n|    min|                 1|\n|    25%|                 1|\n|    50%|                 2|\n|    75%|                 4|\n|    max|             59623|\n+-------+------------------+\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=15",
+              "$$hashKey": "object:19359"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=16",
+              "$$hashKey": "object:19360"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=17",
+              "$$hashKey": "object:19361"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=18",
+              "$$hashKey": "object:19362"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=19",
+              "$$hashKey": "object:19363"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639408390954_1986523703",
+      "id": "paragraph_1639408390954_1986523703",
+      "dateCreated": "2021-12-13T15:13:10+0000",
+      "dateStarted": "2021-12-13T15:15:02+0000",
+      "dateFinished": "2021-12-13T15:16:48+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14919"
+    },
+    {
+      "title": "Critério de separação dos bots",
+      "text": "%pyspark\ndf_botReview.summary([\"99%\", \"99.6%\", \"99.8%\", \"99.9%\", \"99.95%\", \"99.96%\", \"99.97%\", \"99.98%\", \"99.99%\", \"max\"]).show()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T17:59:42+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+-------+-----------+-----+\n|summary|customer_id|count|\n+-------+-----------+-----+\n|    99%|   52749681|   46|\n|  99.6%|   52960654|   76|\n|  99.8%|   53029878|  107|\n|  99.9%|   53067103|  159|\n| 99.95%|   53084095|  202|\n| 99.96%|   53084095|  246|\n| 99.97%|   53088145|  246|\n| 99.98%|   53096579|  349|\n| 99.99%|   53096579|  349|\n|    max|   53096592|59623|\n+-------+-----------+-----+\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=52",
+              "$$hashKey": "object:19437"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=53",
+              "$$hashKey": "object:19438"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=54",
+              "$$hashKey": "object:19439"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=55",
+              "$$hashKey": "object:19440"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=56",
+              "$$hashKey": "object:19441"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639411612043_780165616",
+      "id": "paragraph_1639411612043_780165616",
+      "dateCreated": "2021-12-13T16:06:52+0000",
+      "dateStarted": "2021-12-13T16:36:43+0000",
+      "dateFinished": "2021-12-13T16:38:39+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14920"
+    },
+    {
+      "text": "%pyspark\ndf_bots = df_botReview.filter(\"count > 250\")",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T18:07:38+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639418342368_701513839",
+      "id": "paragraph_1639418342368_701513839",
+      "dateCreated": "2021-12-13T17:59:02+0000",
+      "dateStarted": "2021-12-13T18:07:38+0000",
+      "dateFinished": "2021-12-13T18:07:39+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14921"
+    },
+    {
+      "title": "Definição de que pessoas com mais de 250 reviews seriam consideradas como bots",
+      "text": "%pyspark\ndf_bots.show()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T18:39:47+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+-----------+-----+\n|customer_id|count|\n+-----------+-----+\n|   50122160|59623|\n|   50732546|30761|\n|   52496677|14391|\n|   52004451|10905|\n|   50736950|10129|\n|   18116317| 8727|\n|   44731853| 7593|\n|   50881246| 7403|\n|   38002140| 7197|\n|   36642996| 6988|\n|   43430756| 6610|\n|   50068216| 6540|\n|    7080939| 6503|\n|   37529167| 6447|\n|   50913245| 6301|\n|   50199793| 5874|\n|   20018062| 5810|\n|   14539589| 5706|\n|   38214553| 5683|\n|   51184997| 5533|\n+-----------+-----+\nonly showing top 20 rows\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=57",
+              "$$hashKey": "object:19557"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=58",
+              "$$hashKey": "object:19558"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639418862426_592539100",
+      "id": "paragraph_1639418862426_592539100",
+      "dateCreated": "2021-12-13T18:07:42+0000",
+      "dateStarted": "2021-12-13T18:07:50+0000",
+      "dateFinished": "2021-12-13T18:09:19+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14922"
+    },
+    {
+      "title": "Quantidade de bots existentes no DataSet",
+      "text": "%pyspark\ndf_bots.count()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T18:51:56+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "12263\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=110",
+              "$$hashKey": "object:19620"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=111",
+              "$$hashKey": "object:19621"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=112",
+              "$$hashKey": "object:19622"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=113",
+              "$$hashKey": "object:19623"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=114",
+              "$$hashKey": "object:19624"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639421474571_1299590324",
+      "id": "paragraph_1639421474571_1299590324",
+      "dateCreated": "2021-12-13T18:51:14+0000",
+      "dateStarted": "2021-12-13T18:51:29+0000",
+      "dateFinished": "2021-12-13T18:53:01+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14923"
+    },
+    {
+      "text": "%pyspark\ndf_botsCategory = df_bots.join(df_bot, df_bots.customer_id == df_bot.customer_id, 'inner').select(df_bots.customer_id, df_bot.product_category, df_bot.star_rating, df_bot.helpful_votes)    ",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T18:55:58+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639419257471_381744018",
+      "id": "paragraph_1639419257471_381744018",
+      "dateCreated": "2021-12-13T18:14:17+0000",
+      "dateStarted": "2021-12-13T18:55:58+0000",
+      "dateFinished": "2021-12-13T18:55:58+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14924"
+    },
+    {
+      "title": "Início da caracterização dos bots",
+      "text": "%pyspark\ndf_botsCategory.show()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T19:05:04+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+-----------+----------------+-----------+-------------+\n|customer_id|product_category|star_rating|helpful_votes|\n+-----------+----------------+-----------+-------------+\n|   20945414|           Books|          5|            0|\n|   20945414|           Books|          5|            0|\n|   28952249|           Books|          3|           73|\n|   28115554|           Books|          3|            1|\n|   15644656|           Books|          4|            1|\n|   51892421|           Books|          5|            5|\n|   36746605|           Books|          4|           68|\n|   51892421|           Books|          4|            1|\n|   52933548|           Books|          4|            2|\n|   52933548|           Books|          3|            2|\n|   52933548|           Books|          4|            1|\n|   52933548|           Books|          5|            2|\n|   52933548|           Books|          3|            0|\n|   52933548|           Books|          5|            0|\n|   52933548|           Books|          5|            0|\n|   52933548|           Books|          4|            0|\n|   52933548|           Books|          4|            1|\n|   52933548|           Books|          4|            1|\n|   52933548|           Books|          5|            0|\n|   43898203|           Books|          5|            2|\n+-----------+----------------+-----------+-------------+\nonly showing top 20 rows\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=119",
+              "$$hashKey": "object:19740"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=120",
+              "$$hashKey": "object:19741"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=121",
+              "$$hashKey": "object:19742"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=122",
+              "$$hashKey": "object:19743"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=124",
+              "$$hashKey": "object:19744"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639419389161_1601869712",
+      "id": "paragraph_1639419389161_1601869712",
+      "dateCreated": "2021-12-13T18:16:29+0000",
+      "dateStarted": "2021-12-13T18:56:01+0000",
+      "dateFinished": "2021-12-13T18:58:45+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14925"
+    },
+    {
+      "title": "Análise dos 'helpful votes' nas reviews dos bots",
+      "text": "%pyspark\ndf_helpful= df_botsCategory.groupBy('helpful_votes').count()\ndf_helpful.show()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T19:24:26+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+-------------+-----+\n|helpful_votes|count|\n+-------------+-----+\n|           65| 1097|\n|           12|37106|\n|          148|  174|\n|          300|   24|\n|           76|  760|\n|          122|  249|\n|          140|  165|\n|           81|  697|\n|          133|  210|\n|          597|    6|\n|          192|   68|\n|          539|    8|\n|          177|  106|\n|          599|    5|\n|          126|  219|\n|          209|   58|\n|          876|    3|\n|         1088|    2|\n|          548|    5|\n|          333|   17|\n+-------------+-----+\nonly showing top 20 rows\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=125",
+              "$$hashKey": "object:19818"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=126",
+              "$$hashKey": "object:19819"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=127",
+              "$$hashKey": "object:19820"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=128",
+              "$$hashKey": "object:19821"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=130",
+              "$$hashKey": "object:19822"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=131",
+              "$$hashKey": "object:19823"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639422142713_1557333729",
+      "id": "paragraph_1639422142713_1557333729",
+      "dateCreated": "2021-12-13T19:02:22+0000",
+      "dateStarted": "2021-12-13T19:02:52+0000",
+      "dateFinished": "2021-12-13T19:05:40+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14926"
+    },
+    {
+      "text": "%pyspark\ndf_botVotes = df_helpful.orderBy(\"count\",ascending=False)\ndf_botVotes.show()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T19:06:58+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+-------------+-------+\n|helpful_votes|  count|\n+-------------+-------+\n|            0|2609829|\n|            1|1221123|\n|            2| 599088|\n|            3| 362104|\n|            4| 239053|\n|            5| 169818|\n|            6| 126176|\n|            7|  96849|\n|            8|  77038|\n|            9|  62071|\n|           10|  51621|\n|           11|  43256|\n|           12|  37106|\n|           13|  32109|\n|           14|  27495|\n|           15|  24479|\n|           16|  21291|\n|           17|  18724|\n|           18|  17085|\n|           19|  15190|\n+-------------+-------+\nonly showing top 20 rows\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=132",
+              "$$hashKey": "object:19901"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=133",
+              "$$hashKey": "object:19902"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=134",
+              "$$hashKey": "object:19903"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=135",
+              "$$hashKey": "object:19904"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=137",
+              "$$hashKey": "object:19905"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=138",
+              "$$hashKey": "object:19906"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639422379135_474558104",
+      "id": "paragraph_1639422379135_474558104",
+      "dateCreated": "2021-12-13T19:06:19+0000",
+      "dateStarted": "2021-12-13T19:06:58+0000",
+      "dateFinished": "2021-12-13T19:09:45+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14927"
+    },
+    {
+      "text": "%pyspark\ndf_botVotes2 = df_helpful.orderBy(\"helpful_votes\",ascending=False)\ndf_botVotes2.show()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T19:22:48+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+-------------+-----+\n|helpful_votes|count|\n+-------------+-----+\n|        28611|    1|\n|        27550|    1|\n|        13557|    1|\n|        11526|    1|\n|        11444|    1|\n|        10787|    1|\n|        10265|    1|\n|         9991|    1|\n|         8542|    1|\n|         7757|    1|\n|         7548|    1|\n|         7166|    1|\n|         6699|    1|\n|         6537|    1|\n|         6503|    1|\n|         6330|    1|\n|         6299|    1|\n|         6285|    1|\n|         6245|    1|\n|         6056|    1|\n+-------------+-----+\nonly showing top 20 rows\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=146",
+              "$$hashKey": "object:19984"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=147",
+              "$$hashKey": "object:19985"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=148",
+              "$$hashKey": "object:19986"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=149",
+              "$$hashKey": "object:19987"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=151",
+              "$$hashKey": "object:19988"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=152",
+              "$$hashKey": "object:19989"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639422740019_236655105",
+      "id": "paragraph_1639422740019_236655105",
+      "dateCreated": "2021-12-13T19:12:20+0000",
+      "dateStarted": "2021-12-13T19:22:48+0000",
+      "dateFinished": "2021-12-13T19:25:35+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14928"
+    },
+    {
+      "text": "%pyspark\ndf_products= df_botsCategory.groupBy('product_category').count()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T18:21:53+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639419621290_2042377283",
+      "id": "paragraph_1639419621290_2042377283",
+      "dateCreated": "2021-12-13T18:20:21+0000",
+      "dateStarted": "2021-12-13T18:21:53+0000",
+      "dateFinished": "2021-12-13T18:21:53+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14929"
+    },
+    {
+      "title": "Divisão por categoria de produtos",
+      "text": "%pyspark\ndf_products.show()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T18:42:36+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+--------------------+-------+\n|    product_category|  count|\n+--------------------+-------+\n|                  PC| 115313|\n|    Major Appliances|   1400|\n|    Home Improvement|  60560|\n|             Kitchen| 127380|\n|              Sports|  73267|\n|               Video|  49522|\n| Digital_Video_Games|   2483|\n|        Pet Products|  60318|\n|                null|     54|\n|          2012-12-15|      1|\n|            Outdoors|  36644|\n|             Grocery| 104525|\n|               Books|1775154|\n|         Mobile_Apps|  59252|\n|           Furniture|  10831|\n|Digital_Music_Pur...|  71819|\n|             Jewelry|  29177|\n|             Watches|  10194|\n|               Shoes|  36305|\n|                Toys| 130928|\n+--------------------+-------+\nonly showing top 20 rows\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=65",
+              "$$hashKey": "object:20109"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=66",
+              "$$hashKey": "object:20110"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=67",
+              "$$hashKey": "object:20111"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=68",
+              "$$hashKey": "object:20112"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=70",
+              "$$hashKey": "object:20113"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=71",
+              "$$hashKey": "object:20114"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=72",
+              "$$hashKey": "object:20115"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=73",
+              "$$hashKey": "object:20116"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639419715382_201829318",
+      "id": "paragraph_1639419715382_201829318",
+      "dateCreated": "2021-12-13T18:21:55+0000",
+      "dateStarted": "2021-12-13T18:22:04+0000",
+      "dateFinished": "2021-12-13T18:24:51+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14930"
+    },
+    {
+      "text": "%pyspark\ndf_botProducts = df_products.orderBy(\"count\",ascending=False)",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T18:26:54+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639419996163_204410139",
+      "id": "paragraph_1639419996163_204410139",
+      "dateCreated": "2021-12-13T18:26:36+0000",
+      "dateStarted": "2021-12-13T18:26:54+0000",
+      "dateFinished": "2021-12-13T18:26:54+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14931"
+    },
+    {
+      "title": "Produtos mais avaliados pelos bots",
+      "text": "%pyspark\ndf_botProducts.show()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T18:42:58+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+--------------------+-------+\n|    product_category|  count|\n+--------------------+-------+\n|               Books|1775154|\n|Digital_Ebook_Pur...|1263212|\n|           Video DVD| 505447|\n|               Music| 471887|\n|                Home| 143605|\n|Health & Personal...| 136821|\n|                Toys| 130928|\n|             Kitchen| 127380|\n|              Beauty| 126621|\n|                  PC| 115313|\n|             Grocery| 104525|\n|            Wireless|  94414|\n|     Office Products|  76385|\n|             Apparel|  76111|\n|              Sports|  73267|\n|Digital_Music_Pur...|  71819|\n|Digital_Video_Dow...|  69077|\n|         Electronics|  61437|\n|    Home Improvement|  60560|\n|        Pet Products|  60318|\n+--------------------+-------+\nonly showing top 20 rows\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=74",
+              "$$hashKey": "object:20244"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=75",
+              "$$hashKey": "object:20245"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=76",
+              "$$hashKey": "object:20246"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=77",
+              "$$hashKey": "object:20247"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=79",
+              "$$hashKey": "object:20248"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=80",
+              "$$hashKey": "object:20249"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639420017391_88112157",
+      "id": "paragraph_1639420017391_88112157",
+      "dateCreated": "2021-12-13T18:26:57+0000",
+      "dateStarted": "2021-12-13T18:27:07+0000",
+      "dateFinished": "2021-12-13T18:29:55+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14932"
+    },
+    {
+      "text": "%pyspark\ndf_botRatings= df_botsCategory.groupBy('star_rating').count()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T18:36:15+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639420552911_2033885539",
+      "id": "paragraph_1639420552911_2033885539",
+      "dateCreated": "2021-12-13T18:35:52+0000",
+      "dateStarted": "2021-12-13T18:36:15+0000",
+      "dateFinished": "2021-12-13T18:36:15+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14933"
+    },
+    {
+      "title": "Análise dos comportamento dos bots, se são mais positivos ou negativos",
+      "text": "%pyspark\ndf_botRatings.show()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T18:43:47+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+-----------+-------+\n|star_rating|  count|\n+-----------+-------+\n|       null|     56|\n|          3| 667541|\n|          1| 175670|\n|          5|3384725|\n|          4|1619073|\n|          2| 244964|\n+-----------+-------+\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=87",
+              "$$hashKey": "object:20369"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=88",
+              "$$hashKey": "object:20370"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=89",
+              "$$hashKey": "object:20371"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=90",
+              "$$hashKey": "object:20372"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=92",
+              "$$hashKey": "object:20373"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=93",
+              "$$hashKey": "object:20374"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=94",
+              "$$hashKey": "object:20375"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=95",
+              "$$hashKey": "object:20376"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639420577435_517195092",
+      "id": "paragraph_1639420577435_517195092",
+      "dateCreated": "2021-12-13T18:36:17+0000",
+      "dateStarted": "2021-12-13T18:36:25+0000",
+      "dateFinished": "2021-12-13T18:39:12+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14934"
+    },
+    {
+      "text": "%pyspark\ndf_botStarRatings = df_botRatings.orderBy(\"count\",ascending=False)",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T18:40:41+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639420813792_602270005",
+      "id": "paragraph_1639420813792_602270005",
+      "dateCreated": "2021-12-13T18:40:13+0000",
+      "dateStarted": "2021-12-13T18:40:41+0000",
+      "dateFinished": "2021-12-13T18:40:41+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14935"
+    },
+    {
+      "title": "Percepção que os bots possuem um comportamento mais positivo",
+      "text": "%pyspark\ndf_botStarRatings.show()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T18:45:01+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+-----------+-------+\n|star_rating|  count|\n+-----------+-------+\n|          5|3384725|\n|          4|1619073|\n|          3| 667541|\n|          2| 244964|\n|          1| 175670|\n|       null|     56|\n+-----------+-------+\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=96",
+              "$$hashKey": "object:20504"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=97",
+              "$$hashKey": "object:20505"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=98",
+              "$$hashKey": "object:20506"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=99",
+              "$$hashKey": "object:20507"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=101",
+              "$$hashKey": "object:20508"
+            },
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=102",
+              "$$hashKey": "object:20509"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639420843134_1062658531",
+      "id": "paragraph_1639420843134_1062658531",
+      "dateCreated": "2021-12-13T18:40:43+0000",
+      "dateStarted": "2021-12-13T18:40:50+0000",
+      "dateFinished": "2021-12-13T18:43:36+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14936"
+    },
+    {
+      "title": "Task 3",
+      "text": "",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T18:25:10+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733934_864518677",
+      "id": "paragraph_1639253043099_121743386",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "status": "READY",
+      "$$hashKey": "object:14937"
+    },
+    {
+      "title": "Selecionando as colunas desejadas",
+      "text": "%pyspark\ndf_columns=df.select(\"star_rating\",\"review_body\")\n",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T20:12:33+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733934_1301208234",
+      "id": "paragraph_1639242396751_1981515405",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "dateStarted": "2021-12-13T20:12:33+0000",
+      "dateFinished": "2021-12-13T20:12:33+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14938"
+    },
+    {
+      "title": "Apagando NaN",
+      "text": "%pyspark\ndf_nv=df_columns.dropna()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T20:12:35+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733934_412035779",
+      "id": "paragraph_1639249652137_1048273825",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "dateStarted": "2021-12-13T20:12:35+0000",
+      "dateFinished": "2021-12-13T20:12:35+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14939"
+    },
+    {
+      "text": "%pyspark\ndf_nv.show()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T20:12:38+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+-----------+--------------------+\n|star_rating|         review_body|\n+-----------+--------------------+\n|          4|Dyan Cannon, the ...|\n|          5|The book was in e...|\n|          3|This book deals w...|\n|          5|I'm still new to ...|\n|          5|Absolutely the mo...|\n|          1|Take this GD book...|\n|          5|This book is FANT...|\n|          1|In his own words:...|\n|          5|Light, very plesa...|\n|          3|It was a nice lit...|\n|          5|Love the scriptur...|\n|          5|Sweet Land of Lib...|\n|          4|In the book Lit b...|\n|          4|Today's pick is S...|\n|          5|This is an excell...|\n|          5|This collection c...|\n|          2|I have used Swork...|\n|          2|This book was a l...|\n|          5|Paolo Bacigalupi ...|\n|          5|I was expecting t...|\n+-----------+--------------------+\nonly showing top 20 rows\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=153",
+              "$$hashKey": "object:20713"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733935_780757428",
+      "id": "paragraph_1639249680986_1101203167",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "dateStarted": "2021-12-13T20:12:38+0000",
+      "dateFinished": "2021-12-13T20:12:47+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14940"
+    },
+    {
+      "title": "Criando categorias para ratings",
+      "text": "%pyspark\nfrom pyspark.sql.functions import when, lit\n\n\ndf_rating_label=  df_nv.withColumn(\"label_rating\", \\\n   when((df.star_rating <= 3), lit(\"negativo\")) \\\n     .when((df.star_rating == 4), lit(\"neutro\")) \\\n     .otherwise(lit(\"positivo\")) \\\n  )",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T20:12:41+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733935_105698058",
+      "id": "paragraph_1639249790620_152407597",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "dateStarted": "2021-12-13T20:12:41+0000",
+      "dateFinished": "2021-12-13T20:12:47+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14941"
+    },
+    {
+      "text": "%pyspark\ndf_rating_label.show()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T20:12:44+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+-----------+--------------------+------------+\n|star_rating|         review_body|label_rating|\n+-----------+--------------------+------------+\n|          4|Dyan Cannon, the ...|      neutro|\n|          5|The book was in e...|    positivo|\n|          3|This book deals w...|    negativo|\n|          5|I'm still new to ...|    positivo|\n|          5|Absolutely the mo...|    positivo|\n|          1|Take this GD book...|    negativo|\n|          5|This book is FANT...|    positivo|\n|          1|In his own words:...|    negativo|\n|          5|Light, very plesa...|    positivo|\n|          3|It was a nice lit...|    negativo|\n|          5|Love the scriptur...|    positivo|\n|          5|Sweet Land of Lib...|    positivo|\n|          4|In the book Lit b...|      neutro|\n|          4|Today's pick is S...|      neutro|\n|          5|This is an excell...|    positivo|\n|          5|This collection c...|    positivo|\n|          2|I have used Swork...|    negativo|\n|          2|This book was a l...|    negativo|\n|          5|Paolo Bacigalupi ...|    positivo|\n|          5|I was expecting t...|    positivo|\n+-----------+--------------------+------------+\nonly showing top 20 rows\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://ip-172-31-58-40.ec2.internal:4040/jobs/job?id=154",
+              "$$hashKey": "object:20813"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733935_806644108",
+      "id": "paragraph_1639249932724_1758357970",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "dateStarted": "2021-12-13T20:12:47+0000",
+      "dateFinished": "2021-12-13T20:12:47+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:14942"
+    },
+    {
+      "title": "Criando pipeline para o modelo",
+      "text": "%pyspark\nstages = []\n\nregexTokenizer = RegexTokenizer(inputCol=\"review_body\", outputCol=\"tokens\", pattern=\"\\W+\")\nstages += [regexTokenizer]\n\ncv = CountVectorizer(inputCol=\"tokens\", outputCol=\"token_features\", minDF=2.0)#, vocabSize=3, minDF=2.0\nstages += [cv]\n\nindexer = StringIndexer(inputCol=\"label_rating\", outputCol=\"label\")\nstages += [indexer]\n\nvecAssembler = VectorAssembler(inputCols=['token_features'], outputCol=\"features\")\nstages += [vecAssembler]\n\n[print('\\n', stage) for stage in stages]\n",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T14:45:33+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "\n RegexTokenizer_809699257170\n\n CountVectorizer_681385e22f86\n\n StringIndexer_322d17d4e6a8\n\n VectorAssembler_9f6c84f57a48\n[None, None, None, None]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733935_1146485833",
+      "id": "paragraph_1639238211166_151036966",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "status": "READY",
+      "$$hashKey": "object:14943"
+    },
+    {
+      "title": "Transformando os dados",
+      "text": "%pyspark\nfrom pyspark.ml import Pipeline\n\npipeline = Pipeline(stages=stages)\ndata = pipeline.fit(df_rating_label).transform(df_rating_label)",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T14:45:33+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733935_955149690",
+      "id": "paragraph_1639250082264_150270760",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "status": "READY",
+      "$$hashKey": "object:14944"
+    },
+    {
+      "title": "Dividindo o conjunto",
+      "text": "%pyspark\ntrain, test = data.randomSplit([0.7, 0.3], seed = 2018)",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T14:45:33+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733936_7342177",
+      "id": "paragraph_1639250170723_627086386",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "status": "READY",
+      "$$hashKey": "object:14945"
+    },
+    {
+      "title": "Implementando o Naive Bayes",
+      "text": "%pyspark\nfrom pyspark.ml.classification import NaiveBayes\n\nnb = NaiveBayes(smoothing=1.0, modelType=\"multinomial\")\nmodel = nb.fit(train)\npredictions = model.transform(test)\npredictions.select(\"label\", \"prediction\", \"probability\").show()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T14:45:33+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+-----+----------+--------------------+\n|label|prediction|         probability|\n+-----+----------+--------------------+\n|  1.0|       2.0|[0.14689969838923...|\n|  1.0|       0.0|[0.99925881914965...|\n|  1.0|       2.0|[9.69268469562468...|\n|  1.0|       1.0|[1.62322750674104...|\n|  1.0|       1.0|[0.05353098713425...|\n|  1.0|       1.0|[3.40157862949552...|\n|  1.0|       2.0|[0.16119777497336...|\n|  1.0|       1.0|[0.31236985068454...|\n|  1.0|       1.0|[0.05559681394449...|\n|  1.0|       0.0|[0.62332922516241...|\n|  1.0|       2.0|[1.54485414013397...|\n|  1.0|       1.0|[0.01540995295632...|\n|  1.0|       0.0|[0.97856942591179...|\n|  1.0|       1.0|[0.16132593998323...|\n|  1.0|       1.0|[3.26968808547707...|\n|  1.0|       1.0|[0.03500951459318...|\n|  1.0|       1.0|[2.36458446830631...|\n|  1.0|       1.0|[1.17463926646803...|\n|  1.0|       0.0|[0.96628679397734...|\n|  1.0|       1.0|[1.86175548959850...|\n+-----+----------+--------------------+\nonly showing top 20 rows\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733936_1968748369",
+      "id": "paragraph_1639250768551_1147876132",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "status": "READY",
+      "$$hashKey": "object:14946"
+    },
+    {
+      "title": "Acurácia do modelo",
+      "text": "%pyspark\nfrom pyspark.ml.evaluation import BinaryClassificationEvaluator\nevaluator = BinaryClassificationEvaluator(rawPredictionCol=\"prediction\")\naccuracy = evaluator.evaluate(predictions)\nprint (\"Model Accuracy: \", accuracy)",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T14:45:33+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "Model Accuracy:  0.7417230973647814\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733936_1062675052",
+      "id": "paragraph_1639250832659_2081635630",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "status": "READY",
+      "$$hashKey": "object:14947"
+    },
+    {
+      "title": "Impletando o CrossValidator",
+      "text": "%pyspark\nfrom pyspark.ml.tuning import ParamGridBuilder, CrossValidator\n\nparamGrid = ParamGridBuilder().addGrid(nb.smoothing, [0.0, 0.2, 0.4, 0.6, 0.8, 1.0, 1.5, 2.0]).build()\ncvEvaluator = BinaryClassificationEvaluator(rawPredictionCol=\"prediction\")\n\ncv = CrossValidator(estimator=nb, estimatorParamMaps=paramGrid, evaluator=cvEvaluator)\ncvModel = cv.fit(train)\n\ncvPredictions = cvModel.transform(test)\n\nevaluator.evaluate(cvPredictions)",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:32:21+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true,
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639406733937_1902752751",
+      "id": "paragraph_1639251719410_322447447",
+      "dateCreated": "2021-12-13T14:45:33+0000",
+      "status": "READY",
+      "$$hashKey": "object:14948"
+    }
+  ],
+  "name": "ProjetoFinal",
+  "id": "2GQQZQDCW",
+  "defaultInterpreterGroup": "spark",
+  "version": "0.10.0",
+  "noteParams": {},
+  "noteForms": {},
+  "angularObjects": {},
+  "config": {
+    "isZeppelinNotebookCronEnable": false,
+    "looknfeel": "default",
+    "personalizedMode": "false"
+  },
+  "info": {},
+  "path": "/ProjetoFinal"
+}
